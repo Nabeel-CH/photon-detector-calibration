@@ -9,10 +9,14 @@ description = "Solution for the S1 coursework 2025/26"
 readme = "README.md"
 license = { file = "LICENSE" }
 authors = [
-    { name = "Your Name", email = "crsid@cam.ac.uk" }
+    { name = "Nabeel Chaudary", email = "nc680@cam.ac.uk" }
 ]
 dependencies = [
     "numpy",   # put your requirements here
+    "pandas",
+    "matplotlib.pyplot",
+    "iminuit",
+
 ]
 requires-python = ">=3.9"
 
