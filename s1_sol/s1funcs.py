@@ -1,38 +1,10 @@
-"""Dummy functionality of s1_sol"""
+"""Function definitions for solution.ipynb"""
 
 import numpy as np
-import matplotlib.pyplot as plt
 import json
 import pandas as pd
 from iminuit import Minuit
-from iminuit.cost import LeastSquares
-from iminuit.cost import UnbinnedNLL
-
-
-def make_me_a_plot(size, bins=50):
-    """
-    A a function to demonstrate making a plot
-
-    Parameters
-    ----------
-    size : int
-        Size of random sample to produce
-    bins : int, optional
-        Number of bins for the plotted histogram
-
-    Returns
-    -------
-    fig, ax
-        The matplotlib Figure and Axes
-    """
-
-    x = np.random.normal(size=size)
-
-    fig, ax = plt.subplots()
-    ax.hist(x, bins=bins)
-
-    return fig, ax
-
+from iminuit.cost import LeastSquares, UnbinnedNLL
 
 def make_results_json(filename):
     """
@@ -98,6 +70,7 @@ def make_results_json(filename):
     with open(filename, "w") as f:
         json.dump(ex_dict, f, indent=4)
 
+
 def update_results_json(section_key,
                    lb, lb_err,
                    dE, dE_err,
@@ -105,13 +78,14 @@ def update_results_json(section_key,
                    b, b_err,
                    c, c_err):
     """
-    Update the chosen section of results.json with the given
-    parameter values and errors.
+    Update a selected section of results.json with parameter values and errors.
 
-    section_key must be one of:
-        'sample_ests'
-        'individual_fits'
-        'simultaneous_fit'
+    Parameters:
+        section_key (str): The section to update.
+                           Must be one of "sample_ests", "individual_fits",
+                           or "simultaneous_fit".
+        lb, dE, a, b, c (float): Parameter values.
+        lb_err, dE_err, a_err, b_err, c_err (float): Parameter uncertainties.
     """
 
     filename = "../results.json"
@@ -144,28 +118,69 @@ def update_results_json(section_key,
     print(f"Updated '{section_key}' in results.json")
 
 
-##### Models #####
-# define the model for the mean
+########################## Models ##########################
+
 def mu_model(E0, lb, dE):
+    """
+    Mean model μ_E(E0) = λ E0 + Δ.
+
+    Parameters:
+        E0: True energy 
+        lb: λ.
+        dE: Δ.
+
+    Returns:
+        Mean μ_E(E0).
+    """
     return lb * E0 + dE
 
 # define the model for the width
 def sigma_model(E0, a, b, c):
+    """
+    Width model: σ_E(E0) = E0 * sqrt((a / sqrt(E0))^2 + (b / E0)^2 + c^2).
+
+    Parameters:
+        E0, a, b, c: model parameters.
+
+    Returns:
+        Width σ_E(E0).
+    """
     return E0 * np.sqrt((a / np.sqrt(E0))**2 + (b / E0)**2 + c**2)
 
 #define normal distribution PDF
 def normal_pdf(x, mu, sigma):
     """
-    Normal distribution PDF 
+    Normal probability density function (PDF).
+
+    Parameters:
+        x: Points at which to evaluate the PDF.
+        mu: Mean of the normal distribution.
+        sigma: Standard deviation.
+
+    Returns:
+        PDF values at x.
     """
     return (1.0 / (np.sqrt(2 * np.pi) * sigma)) * np.exp(
         -0.5 * ((x - mu) / sigma) ** 2
     )
 
 #define the model
-def sim_pdf(data, lam, Delta, a, b, c):
+def sim_pdf(data, lb, dE, a, b, c):
     """
-    Gaussian PDF for E given E0.
+    Gaussian PDF for simultaneous likelihood.
+
+    Parameters:
+        data (array): array with
+                           data[0] = E,
+                           data[1] = E0.
+        lb (float)
+        dE (float)
+        a (float)
+        b (float)
+        c (float)
+
+    Returns:
+        PDF values for provided parameters.
     """
 
     # unpack data
@@ -173,7 +188,7 @@ def sim_pdf(data, lam, Delta, a, b, c):
     E0 = data[1]
 
     # mean 
-    mu = lam * E0 + Delta
+    mu = lb * E0 + dE
 
     # width 
     term = (a / np.sqrt(E0))**2 + (b / E0)**2 + c**2
@@ -187,17 +202,22 @@ def sim_pdf(data, lam, Delta, a, b, c):
     return pdf
 
 
-###Question 1####
+########################## Q1 functions ##########################
+
 def sample_est(sample_df):
     """
-    For each E_true value in sample_df, compute:
-      - N          : number of events
-      - mu_est     : sample mean of E_rec
-      - SE_mu      : standard error on the mean
-      - sigma_est : sample standard deviation of E_rec
-      - SE_sigma   : standard error on the standard deviation
+    For each unique E_true value in sample_df, compute sample estimates of the mean
+    and standard deviation of E_rec, along with their errors.
 
-    Returns a DataFrame called summary with one row per E_true
+    Parameters:
+        sample_df (pandas.DataFrame): Input data with columns
+                                      "E_true" and "E_rec".
+
+    Returns:
+        pandas.DataFrame: Summary table with columns
+                          "E_true", "N",
+                          "mu_est", "mu_err",
+                          "sigma_est", "sigma_err".
     """
     # Empty list to store results
     results = []
@@ -237,9 +257,9 @@ def fit_sample_method(summary):
     Fit parameters using sample estimates with Least Squares. Returning the results and 
     the covariance matrices (used later for bootstrap bands).
 
-    Input:
-        summary : DataFrame with columns
-                  E_true, mu_est, mu_err, sigma_est, sigma_err
+    Parameters:
+        summary (Pandas.DataFrame): Columns 
+                        E_true, mu_est, mu_err, sigma_est, sigma_err
     Returns:
         lb, lb_err,
         dE, dE_err,
@@ -266,6 +286,9 @@ def fit_sample_method(summary):
     # create a Minuit object with starting guesses
     mean_minuit = Minuit(mean_cost, lb=1.0, dE=0.0)
 
+    # set limit: lb > 0 
+    mean_minuit.limits["lb"] = (0.0, None)
+
     # run the minimisation
     mean_minuit.migrad()
     mean_minuit.hesse()
@@ -281,6 +304,11 @@ def fit_sample_method(summary):
 
     # Minuit object with starting guesses
     width_minuit = Minuit(width_cost, a=1.0, b=1.0, c=0.1)
+
+    # set limits: a, b, c > 0 
+    width_minuit.limits["a"] = (0.0, None)
+    width_minuit.limits["b"] = (0.0, None)
+    width_minuit.limits["c"] = (0.0, None)
 
     # run the minimisation
     width_minuit.migrad()
@@ -312,17 +340,21 @@ def bootstrap_bands_q1(E_plot,
                        mean_cov,
                        width_params,
                        width_cov,
-                       N_BOOT=1000):
+                       N_BOOT=1000,
+                       random_state=None):
     """
     Parametric bootstrap for Q1 part 4.
 
-    Inputs:
-        E_plot      : 1D array of E0 values where you want the curves
-        mean_params : array-like [lb, dE]
+    Parameters:
+        E_plot      : E0 values
+        mean_params : array [lb, dE]
         mean_cov    : covariance matrix for (lb, dE)
-        width_params: array-like [a, b, c]
+        width_params: array [a, b, c]
         width_cov   : covariance matrix for (a, b, c)
-        N_BOOT      : number of bootstrap replicas (default 1000)
+        N_BOOT      : number of bootstraps (default 1000)
+        random_state: int or None, optional
+                      Seed for the random number generator to make the
+                      bootstrap reproducible. If None, use default RNG.
 
     Returns:
         mu_band    : 1D array, std dev of μ(E0) - E0 over bootstraps
@@ -335,6 +367,9 @@ def bootstrap_bands_q1(E_plot,
     mean_cov     = np.array(mean_cov)
     width_cov    = np.array(width_cov)
 
+    # Local random number generator (for reproducibility if random_state is set)
+    rng = np.random.default_rng(random_state)
+
     # Lists to store all bootstrap curves
     mu_boot_curves    = []
     sigma_boot_curves = []
@@ -342,8 +377,8 @@ def bootstrap_bands_q1(E_plot,
     # Draw new parameter sets from the covariance matrices
     for _ in range(N_BOOT):
         # draw one random parameter set for each model
-        lb_bs, dE_bs = np.random.multivariate_normal(mean_params,  mean_cov)
-        a_bs,  b_bs, c_bs = np.random.multivariate_normal(width_params, width_cov)
+        lb_bs, dE_bs = rng.multivariate_normal(mean_params,  mean_cov)      
+        a_bs,  b_bs, c_bs = rng.multivariate_normal(width_params, width_cov)
 
         # compute and save the corresponding curves
         mu_boot_curves.append(
@@ -364,19 +399,25 @@ def bootstrap_bands_q1(E_plot,
     return mu_band, sigma_band
 
 
+########################## Q2 functions ##########################
 
-####### Question 2 #####
 def indiv_MLsummary(sample_df):
     """
     For each E_true in sample_df, do an unbinned ML Gaussian fit
     to the E_rec values and return a summary table.
+    Perform individual unbinned ML Gaussian fits for each true energy E_true.
 
-    The returned DataFrame indiv_summary has columns:
-      - E_true
-      - mu_est
-      - mu_err
-      - sigma_est
-      - sigma_err
+    For each distinct E_true, fit a normal PDF to the the
+    E_rec values using UnbinnedNLL + Minuit.
+
+    Parameters:
+        sample_df (pandas.DataFrame): Input data with columns
+                                      "E_true" and "E_rec".
+
+    Returns:
+        indiv_summary (pandas.DataFrame): Summary table with one row per E_true with columns
+                          "E_true", "mu_est", "mu_err",
+                          "sigma_est", "sigma_err".
     """
 
     # Empty list to store results
@@ -388,7 +429,7 @@ def indiv_MLsummary(sample_df):
         # Select all E_rec values only with this E0
         data = sample_df[sample_df["E_true"] == E0]["E_rec"]
 
-        # quick initial guesses using sample mean/std
+        # initial guesses using sample mean/std
         mu_initial    = np.mean(data)
         sigma_initial = np.std(data, ddof=1)
 
@@ -397,6 +438,13 @@ def indiv_MLsummary(sample_df):
 
         # set up Minuit with starting values
         m = Minuit(cost, mu=mu_initial, sigma=sigma_initial)
+
+        # set limit: 
+        # sigma > 0 as sigma must be positive
+        # mu > 0 as energies are positive
+        m.limits["sigma"] = (0.0, None)
+        m.limits["mu"] = (0.0, None)
+
 
         # run the minimiser
         m.migrad()
@@ -425,17 +473,25 @@ def indiv_MLsummary(sample_df):
     return indiv_summary
 
 
-##### Question 3 #####
+########################## Q3 functions ##########################
+
 def simultaneous_ML_fit(sample_df):
     """
     Simultaneous unbinned ML fit for all events.
+    Fits all (E_rec, E_true) pairs at once using the likihood function defined in `sim_pdf` 
+    and UnbinnedNLL + Minuit, to estimate all parameters.
 
-    Uses sim_pdf as the model PDF and returns:
-        lam_sim, lam_err,
-        Delta_sim, Delta_err,
-        a_sim, a_err,
-        b_sim, b_err,
-        c_sim, c_err
+    Parameters:
+        sample_df (pandas.DataFrame): Input data with columns
+                                      "E_true" and "E_rec".
+
+    Returns:
+             lb_sim, lb_err,
+             dE_sim, dE_err,
+             a_sim, a_err,
+             b_sim, b_err,
+             c_sim, c_err,
+             covariance matrix
     """
 
     # Get data for fit
@@ -452,60 +508,85 @@ def simultaneous_ML_fit(sample_df):
     # Starting guesses for the parameters
     sim_minuit = Minuit(
         sim_cost,
-        lam=1.0,
-        Delta=0.0,
+        lb=1.0,
+        dE=0.0,
         a=0.3,
         b=1.0,
         c=0.05,
     )
+
+    # set limits: all parameters > 0
+    sim_minuit.limits["lb"] = (0.0, None)
+    sim_minuit.limits["a"]  = (0.0, None)
+    sim_minuit.limits["b"]  = (0.0, None)
+    sim_minuit.limits["c"]  = (0.0, None)
 
     # Minimise the negative log-likelihood and get errors
     sim_minuit.migrad()
     sim_minuit.hesse()
 
     # get fitted values
-    lam_sim   = sim_minuit.values["lam"]
-    Delta_sim = sim_minuit.values["Delta"]
+    lb_sim   = sim_minuit.values["lb"]
+    dE_sim = sim_minuit.values["dE"]
     a_sim     = sim_minuit.values["a"]
     b_sim     = sim_minuit.values["b"]
     c_sim     = sim_minuit.values["c"]
 
-    lam_err   = sim_minuit.errors["lam"]
-    Delta_err = sim_minuit.errors["Delta"]
+    lb_err   = sim_minuit.errors["lb"]
+    dE_err = sim_minuit.errors["dE"]
     a_err     = sim_minuit.errors["a"]
     b_err     = sim_minuit.errors["b"]
     c_err     = sim_minuit.errors["c"]
 
     return (
-        lam_sim,   lam_err,
-        Delta_sim, Delta_err,
+        lb_sim,   lb_err,
+        dE_sim, dE_err,
         a_sim,     a_err,
         b_sim,     b_err,
         c_sim,     c_err,
         sim_minuit.covariance
     )
 
-def bootstrap_bands_q3(E_plot, param_mean, param_cov, N_BOOT=500):
+def bootstrap_bands_q3(E_plot, param_mean, param_cov, N_BOOT=1000, random_state=None):
     """
     Parametric bootstrap for the simultaneous fit (Q3).
 
-    param_mean : [lam, Delta, a, b, c]
-    param_cov  : covariance matrix
+    Parameters:
+        E_plot (array):
+            E0 where the curves are evaluated.
+        param_mean (array):
+            Parameter values [lb, dE, a, b, c].
+        param_cov (array):
+            Covariance matrix for [lb, dE, a, b, c].
+        N_BOOT (int, optional):
+            Number of bootstraps (default 1000).
+        random_state (int or None, optional):
+            Seed for the random number generator to make the bootstrap
+            reproducible. If None, use the default RNG.
+        
+    Returns:
+        mu_band (numpy.ndarray):
+            Standard deviation of (μ(E0) − E0) across bootstrap replicas, at each E0 in E_plot.
+        sigma_band (numpy.ndarray):
+            Standard deviation of (σ(E0)/E0) across bootstrap replicas, at each E0 in E_plot.
     """
 
     param_mean = np.array(param_mean)
     param_cov  = np.array(param_cov)
 
+    # Local RNG for reproducibility
+    rng = np.random.default_rng(random_state)
+
     mu_boot_curves    = []
     sigma_boot_curves = []
 
     for _ in range(N_BOOT):
-        lam_b, Delta_b, a_b, b_b, c_b = np.random.multivariate_normal(
+        lb_b, dE_b, a_b, b_b, c_b = rng.multivariate_normal( 
             param_mean, param_cov
         )
 
         mu_boot_curves.append(
-            mu_model(E_plot, lam_b, Delta_b) - E_plot
+            mu_model(E_plot, lb_b, dE_b) - E_plot
         )
         sigma_boot_curves.append(
             sigma_model(E_plot, a_b, b_b, c_b) / E_plot
@@ -518,3 +599,156 @@ def bootstrap_bands_q3(E_plot, param_mean, param_cov, N_BOOT=500):
     sigma_band = sigma_boot_curves.std(axis=0)
 
     return mu_band, sigma_band
+
+def load_results_table(filename="../results.json"):
+    """
+    Load the parameter estimates and errors from results.json
+    and return them as a tidy DataFrame.
+
+    Parameters:
+        filename (str, optional):
+            Path to the JSON results file. Defaults to "../results.json".
+
+    Returns:
+        df_results (pandas.DataFrame):
+            DataFrame with columns:
+              - 'method'   : 'sample', 'individual', or 'simultaneous'
+              - 'parameter': 'lb', 'dE', 'a', 'b', or 'c'
+              - 'value'    : values of the parameters
+              - 'error'    : uncertainty of the parameters
+    """
+    # Load the JSON file
+    with open(filename, "r") as f:
+        results = json.load(f)
+
+    rows = []
+
+    method_names = {
+        "sample_ests":      "sample",
+        "individual_fits":  "individual",
+        "simultaneous_fit": "simultaneous",
+    }
+
+    params = ["lb", "dE", "a", "b", "c"]
+
+    for key_json, method_label in method_names.items():
+        vals = results[key_json]["values"]
+        errs = results[key_json]["errors"]
+
+        for p in params:
+            rows.append({
+                "method":   method_label,
+                "parameter": p,
+                "value":    vals[p],
+                "error":    errs[p],
+            })
+
+    # make table
+    df_results = pd.DataFrame(rows)
+
+    return df_results
+
+########################## Q4 functions ##########################
+
+def run_bootstrap_all_methods(sample_df, N_BOOT=2500, random_state=30):
+    """
+    Run the non-parametric bootstrap for all three methods
+    (sample, individual, simultaneous) and return a DataFrame of bootstrap parameter values.
+
+    Parameters:
+        sample_df (pandas.DataFrame):
+            Data with columns "E_true" and "E_rec".
+        N_BOOT (int, optional):
+            Number of bootstrap resamples (default 2500).
+        random_state (int, optional):
+            Seed for the random number generator to make the
+            bootstrap reproducible (default 30).
+
+    Returns:
+        boot_df (pandas.DataFrame):
+            Bootstrap results with columns:
+              - "method"   : "sample", "individual", or "simultaneous"
+              - "parameter": "lb", "dE", "a", "b", or "c"
+              - "value"    : bootstrapped parameter value
+    """
+    # set up bootstrap
+    N = len(sample_df)  # original sample size
+
+    # local RNG with a fixed seed for reproducibility
+    rng = np.random.default_rng(random_state)
+
+    methods = ["sample", "individual", "simultaneous"]
+    params  = ["lb", "dE", "a", "b", "c"]
+
+    # store bootstrapped parameter values
+    boot_results = {m: {p: [] for p in params} for m in methods}
+
+    # bootstrap loop
+    for i in range(N_BOOT):
+        # sample rows with replacement
+        idx   = rng.integers(0, N, size=N)
+        df_bs = sample_df.iloc[idx].reset_index(drop=True)
+
+        ##Method 1: sample estimates##
+        summary_bs = sample_est(df_bs)
+
+        (
+            lb_s,  lb_err_s,
+            dE_s,  dE_err_s,
+            a_s,   a_err_s,
+            b_s,   b_err_s,
+            c_s,   c_err_s,
+            cov_mu_s, cov_sigma_s,
+        ) = fit_sample_method(summary_bs)
+
+        boot_results["sample"]["lb"].append(lb_s)
+        boot_results["sample"]["dE"].append(dE_s)
+        boot_results["sample"]["a"].append(a_s)
+        boot_results["sample"]["b"].append(b_s)
+        boot_results["sample"]["c"].append(c_s)
+
+        ##Method 2: individual fits##
+        indiv_bs = indiv_MLsummary(df_bs)
+
+        (
+            lb_i,  lb_err_i,
+            dE_i,  dE_err_i,
+            a_i,   a_err_i,
+            b_i,   b_err_i,
+            c_i,   c_err_i,
+            cov_mu_i, cov_sigma_i,
+        ) = fit_sample_method(indiv_bs)
+
+        boot_results["individual"]["lb"].append(lb_i)
+        boot_results["individual"]["dE"].append(dE_i)
+        boot_results["individual"]["a"].append(a_i)
+        boot_results["individual"]["b"].append(b_i)
+        boot_results["individual"]["c"].append(c_i)
+
+        ##Method 3: simultaneous fit##
+        (
+            lb_sim,   lb_err_sim,
+            dE_sim,   dE_err_sim,
+            a_sim,    a_err_sim,
+            b_sim,    b_err_sim,
+            c_sim,    c_err_sim,
+            sim_cov,
+        ) = simultaneous_ML_fit(df_bs)
+
+        boot_results["simultaneous"]["lb"].append(lb_sim)
+        boot_results["simultaneous"]["dE"].append(dE_sim)
+        boot_results["simultaneous"]["a"].append(a_sim)
+        boot_results["simultaneous"]["b"].append(b_sim)
+        boot_results["simultaneous"]["c"].append(c_sim)
+
+    # Put results into a DataFrame
+    rows = []
+    for method in methods:
+        for p in params:
+            for val in boot_results[method][p]:
+                rows.append({"method": method, "parameter": p, "value": val})
+
+    boot_df = pd.DataFrame(rows)
+
+    return boot_df
+
