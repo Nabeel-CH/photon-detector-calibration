@@ -39,7 +39,7 @@ def plot1_1(sample_df, bins=50):
     ax.hist(sample_df["E_difference"], bins=bins, histtype="bar")
 
     # Add labels and title 
-    ax.set_xlabel("$(E - E_0)$ /GeV")
+    ax.set_xlabel("$(E - E_0)$ [GeV]")
     ax.set_ylabel("Number of events")
     ax.set_title("Distribution of Energy Difference $(E - E_0)$")
 
@@ -85,7 +85,7 @@ def plot1_2(sample_df, bins=50):
         )
 
     # Add labels and title
-    ax.set_xlabel("$(E - E_0)$ /GeV")
+    ax.set_xlabel("$(E - E_0)$ [GeV]")
     ax.set_ylabel("Probability density")
     ax.set_title(r"Distribution of $(E - E_0)$ for different $E_0$ values")
 
@@ -130,8 +130,8 @@ def plot1_3(summary):
         fmt="x",
         capsize=3,
     )
-    ax[0].set_xlabel("$E_0$ /GeV")
-    ax[0].set_ylabel("$\\hat{\\mu}_{\\rm samp}$ /GeV")
+    ax[0].set_xlabel("$E_0$ [GeV]")
+    ax[0].set_ylabel("$\\hat{\\mu}_{\\rm samp}$ [GeV]")
     ax[0].set_title("Estimate of Sample Mean vs $E_0$")
 
     # Plot 2: std dev vs E_true (with error bars)
@@ -142,8 +142,8 @@ def plot1_3(summary):
         fmt="x",
         capsize=3,
     )
-    ax[1].set_xlabel("$E_0$ /GeV")
-    ax[1].set_ylabel("$\\hat{\\sigma}_{\\rm samp}$ /GeV")
+    ax[1].set_xlabel("$E_0$ [GeV]")
+    ax[1].set_ylabel("$\\hat{\\sigma}_{\\rm samp}$ [GeV]")
     ax[1].set_title("Estimate of Sample Std Dev vs $E_0$")
 
     # Adjust layout
@@ -203,12 +203,12 @@ def plot1_4(summary,
     ax[1].plot(E0, sigma_ratio, "o", label="data")
 
     # set labels and titles
-    ax[0].set_xlabel("$E_0$ /GeV")
-    ax[0].set_ylabel("($\\hat{\\mu}_{\\rm samp}$ - $E_0$) /GeV")
+    ax[0].set_xlabel("$E_0$ [GeV]")
+    ax[0].set_ylabel("($\\hat{\\mu}_{\\rm samp}$ - $E_0$) [GeV]")
     ax[0].set_title("($\\hat{\\mu}_{\\rm samp}$ - $E_0$) vs $E_0$")
 
-    ax[1].set_xlabel("$E_0$ /GeV")
-    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$) /GeV")
+    ax[1].set_xlabel("$E_0$ [GeV]")
+    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$) [GeV]")
     ax[1].set_title("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$) vs $E_0$")
     # Part 2: overlay the fitted curves
     # E0 values for the fits
@@ -357,7 +357,7 @@ def plot2_1(sample_df, indiv_summary):
             linestyle="--",
             color=color  # same colour as the histogram
         )
-    ax[0].set_xlabel("($E - E_0$) /GeV")
+    ax[0].set_xlabel("($E - E_0$) [GeV]")
     ax[0].set_ylabel("Probability density")
     ax[0].set_title("Distributions of ($E - E_0$) at each $E_0$ along with ML fits")
     ax[0].legend()
@@ -398,7 +398,7 @@ def plot2_1(sample_df, indiv_summary):
     # Overlay the summed model
     ax[1].plot(x_grid, total_pdf, label="weighted sum of ML fits")
 
-    ax[1].set_xlabel("($E - E_0$) /GeV")
+    ax[1].set_xlabel("($E - E_0$) [GeV]")
     ax[1].set_ylabel("Probability density")
     ax[1].set_title("All ($E - E_0$) overlaid with sum of sub-distributions")
     ax[1].legend()
@@ -458,12 +458,12 @@ def plot2_2(indiv_summary,
     ax[1].plot(E0, sigma_ratio, "o", label="data")
 
     # set labels and titles
-    ax[0].set_xlabel("$E_0$ /GeV")
-    ax[0].set_ylabel("($\\hat{\\mu}_{\\rm indiv} - E_0$) /GeV")
+    ax[0].set_xlabel("$E_0$ [GeV]")
+    ax[0].set_ylabel("($\\hat{\\mu}_{\\rm indiv} - E_0$) [GeV]")
     ax[0].set_title("($\\hat{\\mu}_{\\rm indiv} - E_0$) vs $E_0$")
 
-    ax[1].set_xlabel("$E_0$ /GeV")
-    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$) /GeV")
+    ax[1].set_xlabel("$E_0$ [GeV]")
+    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$) [GeV]")
     ax[1].set_title("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$) vs $E_0$")
 
     # Part 2: overlay the fitted curves
@@ -601,8 +601,8 @@ def plot3_1(sample_df,
         alpha=0.3,
         label="bootstrap ±1${\\sigma}$",
     )
-    ax[0].set_xlabel("$E_0$ /GeV")
-    ax[0].set_ylabel("(${\\mu}_{\\rm E}$ - $E_0$) /GeV")
+    ax[0].set_xlabel("$E_0$ [GeV]")
+    ax[0].set_ylabel("(${\\mu}_{\\rm E}$ - $E_0$) [GeV]")
     ax[0].set_title("(${\\mu}_{\\rm E}$ - $E_0$) vs $E_0$")
     ax[0].legend()
 
@@ -615,8 +615,8 @@ def plot3_1(sample_df,
         alpha=0.3,
         label="bootstrap ±1${\\sigma}$",
     )
-    ax[1].set_xlabel("$E_0$ /GeV")
-    ax[1].set_ylabel("(${\\sigma}_{\\rm E}$ / $E_0$) /GeV")
+    ax[1].set_xlabel("$E_0$ [GeV]")
+    ax[1].set_ylabel("(${\\sigma}_{\\rm E}$ / $E_0$) [GeV]")
     ax[1].set_title("(${\\sigma}_{\\rm E}$ / $E_0$) vs $E_0$")
     ax[1].legend()
 

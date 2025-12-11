@@ -256,6 +256,7 @@ def fit_sample_method(summary):
     """
     Fit parameters using sample estimates with Least Squares. Returning the results and 
     the covariance matrices (used later for bootstrap bands).
+    Used for Q1(iv) and Q2(ii)
 
     Parameters:
         summary (Pandas.DataFrame): Columns 
@@ -303,7 +304,7 @@ def fit_sample_method(summary):
     width_cost = LeastSquares(E0, sigma_values, sigma_errors, sigma_model)
 
     # Minuit object with starting guesses
-    width_minuit = Minuit(width_cost, a=1.0, b=1.0, c=0.1)
+    width_minuit = Minuit(width_cost, a=0.3, b=1.0, c=0.05)
 
     # set limits: a, b, c > 0 
     width_minuit.limits["a"] = (0.0, None)
@@ -674,7 +675,7 @@ def run_bootstrap_all_methods(sample_df, N_BOOT=2500, random_state=30):
     # set up bootstrap
     N = len(sample_df)  # original sample size
 
-    # local RNG with a fixed seed for reproducibility
+    # fixed seed for reproducibility
     rng = np.random.default_rng(random_state)
 
     methods = ["sample", "individual", "simultaneous"]
