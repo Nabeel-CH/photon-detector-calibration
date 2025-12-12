@@ -45,4 +45,5 @@ You should now be able to run the notebook.
 ## Declaration of Use of Autogeneration Tools
 
 Copilot was used in the following: 
- - 
+ - Copilot auto suggestions were used for addng docstrings and comments to code as there was a lot of repeition 
+ - My initial bootstrap loop was very slow, so I used Copilot’s suggestions to restructure it into a more efficient implementation
