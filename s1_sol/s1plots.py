@@ -208,7 +208,7 @@ def plot1_4(summary,
     ax[0].set_title("($\\hat{\\mu}_{\\rm samp}$ - $E_0$) vs $E_0$")
 
     ax[1].set_xlabel("$E_0$ [GeV]")
-    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$) [GeV]")
+    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$)")
     ax[1].set_title("($\\hat{\\sigma}_{\\rm samp}$ / $E_0$) vs $E_0$")
     # Part 2: overlay the fitted curves
     # E0 values for the fits
@@ -463,7 +463,7 @@ def plot2_2(indiv_summary,
     ax[0].set_title("($\\hat{\\mu}_{\\rm indiv} - E_0$) vs $E_0$")
 
     ax[1].set_xlabel("$E_0$ [GeV]")
-    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$) [GeV]")
+    ax[1].set_ylabel("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$)")
     ax[1].set_title("($\\hat{\\sigma}_{\\rm indiv}$ / $E_0$) vs $E_0$")
 
     # Part 2: overlay the fitted curves
@@ -616,7 +616,7 @@ def plot3_1(sample_df,
         label="bootstrap ±1${\\sigma}$",
     )
     ax[1].set_xlabel("$E_0$ [GeV]")
-    ax[1].set_ylabel("(${\\sigma}_{\\rm E}$ / $E_0$) [GeV]")
+    ax[1].set_ylabel("(${\\sigma}_{\\rm E}$ / $E_0$)")
     ax[1].set_title("(${\\sigma}_{\\rm E}$ / $E_0$) vs $E_0$")
     ax[1].legend()
 
