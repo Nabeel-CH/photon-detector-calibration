@@ -1,24 +1,48 @@
-# S1: Statistical Methods for Data Intensive Science
+# S1 Coursework
 
-## Coursework Instructions 25/26
+Repository for the S1 coursework. 
+The solution for this project is in the Jupyter Notebook `notebooks/solution.ipynb`.
 
-You can replace this `README.md` file with your own when you submit the project.
+The assignment question is provided in `notebooks/instructions.ipynb`.
 
-The assignment question is provided in a jupyter notebook saved in `notebooks/instructions.ipynb`. Your solution should be provided in a notebook saved at `notebooks/solution.ipynb`. The majority of your code should live in a pip installable folder called `s1_sol`, which already contains an example file called `example.py` (you can add other files too), and should be loaded into `notebooks/solution.ipynb`. All other instructions can be found in `notebooks/instructions.ipynb`. 
+The majority of the code functionality is implemented in the `s1_sol` package:
+- `s1_sol/s1funcs.py` contains functions for fitting, model definitions and utilities etc 
+- `s1_sol/s1plots.py` contains functions for generating plots
 
-Your `notebooks/solution.ipynb` notebook should produce files in the `figs` folder called:
- - `figs/Figure1.1.pdf`
- - `figs/Figure1.2.pdf`
- - `figs/Figure1.3.pdf`
- - `figs/Figure1.4.pdf`
- - `figs/Figure2.1.pdf`
- - `figs/Figure2.2.pdf`
- - `figs/Figure3.1.pdf`
- - `figs/Figure3.2.pdf`
- - `figs/Figure4.1.pdf`
+The solution notebook produces:
+- Figures saved in the `figs/`
+- A `results.json` file containing parameter estimates from different methods
 
-Your `notebooks/solution.ipynb` notebook should produce a file called `results.json` with the correct format.
+## Installation
 
-The assignment is due on 17/12/2025. You will lose write access to this repository at 23:59 on 17/12/2025 after which you assignment will be assessed.
+1. Clone this GitLab repository to your local machine:
+   ```bash
+   git clone <repository-url>
+   ```
 
-Good luck!
+3. Create and activate a virtual environment (recommended):
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  
+   ```
+
+2. Install the package and its dependencies:
+   ```bash
+   pip install -e .
+   ```
+   
+   This will install the `s1_sol` package.
+
+4. If needed, create a Jupyter kernel for this environment:
+   ```python
+   python -m ipykernel install --user --name s1_coursework --display-name "S1 Coursework"
+   ```
+
+5. Open the solution notebook.
+
+You should now be able to run the notebook. 
+
+## Declaration of Use of Autogeneration Tools
+
+Copilot was used in the following: 
+ - 
