@@ -12,7 +12,7 @@ authors = [
     { name = "Nabeel Chaudary", email = "nc680@cam.ac.uk" }
 ]
 dependencies = [
-    "numpy",   # put your requirements here
+    "numpy",   
     "pandas",
     "matplotlib",
     "iminuit",
