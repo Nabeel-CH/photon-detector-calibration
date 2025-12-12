@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from s1_sol import s1funcs
 
@@ -10,9 +9,9 @@ from s1_sol import s1funcs
 # Formatting constants used for plots 3.2, 4.1, 4.2
 method_order  = ["sample", "individual", "simultaneous"]
 method_colors = {
-    "sample":       "#9AD9DB",  
-    "individual":   "#F7B267",  
-    "simultaneous": "#B3E283",  
+    "sample":       "#3B82F6",
+    "individual":   "#F59E0B",  
+    "simultaneous": "#EC4899",  
 }
 # parameters labels
 param_order = ["lb", "dE", "a", "b", "c"]
