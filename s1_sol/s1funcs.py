@@ -567,7 +567,7 @@ def bootstrap_bands_q3(E_plot, param_mean, param_cov, N_BOOT=1000, random_state=
         
     Returns:
         mu_band (numpy.ndarray):
-            Standard deviation of (μ(E0) − E0) across bootstrap replicas, at each E0 in E_plot.
+            Standard deviation of (μ(E0) - E0) across bootstrap replicas, at each E0 in E_plot.
         sigma_band (numpy.ndarray):
             Standard deviation of (σ(E0)/E0) across bootstrap replicas, at each E0 in E_plot.
     """

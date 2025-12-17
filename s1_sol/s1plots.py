@@ -18,6 +18,7 @@ param_order = ["lb", "dE", "a", "b", "c"]
 param_labels = ["$\\lambda$", "$\\Delta$", "$a$", "$b$", "$c$"]
 
 
+####Functions for making the plots####
 
 def plot1_1(sample_df, bins=50):
     """
