@@ -33,7 +33,7 @@ The solution notebook produces:
    
    This will install the `s1_sol` package.
 
-4. If needed, create a Jupyter kernel for this environment:
+4. If needed, create a Jupyter kernel for this environment (this will require ipykernel):
    ```python
    python -m ipykernel install --user --name s1_coursework --display-name "S1 Coursework"
    ```
